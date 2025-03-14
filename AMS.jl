@@ -134,16 +134,21 @@ function calculate_probability(
         # Push the number of trajectories with importance less than Z into the weights vector
         push!(weights, i)
         
-        # We simulate i new trajectories using the branching method
+        # Delete the first i trajectories
         for j in 1:i
-            random_index::Int = rand(i+1:n_trajectories)
-            branching_point = get_branching_points(trajectories[random_index], Z, importance_func)
             n_calls += trajectories[1].n_calls
             delete!(trajectories, trajectories[1])
+        end
+
+        # Branching
+        for j in 1:i
+            random_index::Int = rand(1:n_trajectories - i)
+            branching_point = get_branching_points(trajectories[random_index], Z, importance_func)
             
             push!(trajectories, simulate(branching_point, beta, r_A, r_B, dt, importance_func, gradV_func, id))
             id += 1.0
         end
+        
         
         # Update Z
         Z = trajectories[k].max
