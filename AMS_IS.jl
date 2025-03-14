@@ -159,10 +159,13 @@ function calculate_probability(
         
         # We simulate i new trajectories using the branching method
         for j in 1:i
-            random_index::Int = rand(i+1:n_trajectories)
-            branching_point, branching_likelihood_arg = get_branching_points(trajectories[random_index], Z, importance_func)
             n_calls += trajectories[1].n_calls
             delete!(trajectories, trajectories[1])
+        end
+
+        for j in 1:i
+            random_index::Int = rand(1:n_trajectories - i)
+            branching_point, branching_likelihood_arg = get_branching_points(trajectories[random_index], Z, importance_func)
             push!(trajectories, simulate(branching_point, beta, r_A, r_B, dt, importance_func, gradV_func, gradb, id, branching_likelihood_arg))
             id += 1.0
         end
